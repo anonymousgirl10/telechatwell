@@ -115,7 +115,7 @@ if (process.env.NODE_ENV === "production") {
   const app = express();
   app.use(express.json());
 
-  const botPath = 'https://github.com/anonymousgirl10/telechatwell/blob/main/index.js'; // Replace with your desired path
+  const botPath = '/index.js'; // Replace with your desired path
   bot.telegram.setWebhook(`https://your-bot-url${botPath}`);
   app.use(bot.webhookCallback(botPath));
 
