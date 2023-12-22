@@ -1,7 +1,7 @@
 const { Telegraf } = require("telegraf");
 const express = require("express");
-const { compose } = require("telegraf");
-const webhookCallback = compose();
+const { webhookCallback } = require("telegraf");
+
 
 
 
@@ -127,7 +127,7 @@ if (process.env.NODE_ENV === "production") {
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
-  app.use(webhookCallback(bot, "express"));
+  app.use(webhookCallback(bot));
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
