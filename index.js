@@ -1,6 +1,8 @@
 const { Telegraf } = require("telegraf");
 const express = require("express");
-const { webhookCallback } = require("telegraf/composer");
+const { compose } = require("telegraf");
+const webhookCallback = compose();
+
 
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN || "");
