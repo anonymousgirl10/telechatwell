@@ -114,10 +114,7 @@ if (process.env.NODE_ENV === "production") {
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
-
-  const botPath = '/'; // Replace with your desired path
-  bot.telegram.setWebhook(`https://your-bot-url${botPath}`);
-  app.use(bot.webhookCallback(botPath));
+  app.use(webhookCallback(bot));
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
