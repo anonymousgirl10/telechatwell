@@ -1,6 +1,9 @@
 const { Telegraf } = require("telegraf");
+const express = require("express");
+const { webhookCallback } = require("telegraf/composer");
 
-const bot = new Telegraf("6268369826:AAHrv4JLOIGW_yqke9T3n1yX3F0VKulzfe0");
+
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN || "");
 const waitingList = [];
 const chatSessions = {};
 let blockerEnabled = false;
@@ -117,4 +120,18 @@ function tryMatchPartners() {
   }
 }
 
-bot.launch();
+// Start the server
+if (process.env.NODE_ENV === "production") {
+  // Use Webhooks for the production server
+  const app = express();
+  app.use(express.json());
+  app.use(webhookCallback(bot, "express"));
+
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Bot listening on port ${PORT}`);
+  });
+} else {
+  // Use Long Polling for development
+  bot.launch();
+}
