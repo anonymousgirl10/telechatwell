@@ -1,6 +1,6 @@
 const { Telegraf } = require("telegraf");
 const express = require("express");
-const { webhookCallback } = require("telegraf");
+
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN || "");
 const waitingList = [];
@@ -109,19 +109,6 @@ function tryMatchPartners() {
   }
 }
 
-// Start the server
-if (process.env.NODE_ENV === "production") {
-  // Use Webhooks for the production server
-  const app = express();
-  app.use(express.json());
-  app.use(webhookCallback(bot));
 
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Bot listening on port ${PORT}`);
-  });
-}
- else {
-  // Use Long Polling for development
   bot.launch();
-}
+
