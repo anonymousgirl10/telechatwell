@@ -2,14 +2,10 @@ const { Telegraf } = require("telegraf");
 const express = require("express");
 const { webhookCallback } = require("telegraf");
 
-
-
-
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN || "");
 const waitingList = [];
 const chatSessions = {};
 let blockerEnabled = false;
-
 // Handle "/start" command
 bot.command("start", (ctx) => {
   const description =
@@ -21,18 +17,15 @@ bot.command("start", (ctx) => {
 
     ctx.reply(description);
 });
-
 // Handle "/find" command
 bot.command("find", (ctx) => {
   const userId = ctx.message.chat.id;
   const activeUsers = Object.keys(chatSessions).length + waitingList.length;
   const chatSessionCount = Object.keys(chatSessions).length / 2;
   const waitingListCount = waitingList.length;
-
   ctx.reply(
     `Searching for a stranger...\nActive users: ${activeUsers}\nChat connect pairs: ${chatSessionCount}\nWaiting Lists: ${waitingListCount}`,
   );
-
   if (userId in chatSessions) {
     ctx.reply("You are already in a chat. Use /end to leave the chat.");
   } else if (userId in waitingList) {
@@ -44,26 +37,21 @@ bot.command("find", (ctx) => {
     tryMatchPartners();
   }
 });
-
 // ... (previous code)
-
 // Handle "/blockon" command
 bot.command("blockon", (ctx) => {
   blockerEnabled = true;
   ctx.reply("Word blocking is enabled.");
 });
-
 // Handle "/unblock" command
 bot.command("unblock", (ctx) => {
   blockerEnabled = false;
   ctx.reply("Word blocking is disabled.");
 });
-
 // Modify the handle_message function to check if blocking is enabled
 bot.on("text", (ctx) => {
   const userId = ctx.message.chat.id;
   const text = ctx.message.text;
-
   if (userId in chatSessions) {
     const partnerId = chatSessions[userId];
     if (partnerId) {
@@ -85,7 +73,6 @@ bot.on("text", (ctx) => {
     );
   }
 });
-
 // Function to check if the message contains blocked words
 function containsBlockedWord(message) {
   const blockedWords = [
