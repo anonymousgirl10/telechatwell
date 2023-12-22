@@ -114,13 +114,17 @@ if (process.env.NODE_ENV === "production") {
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
-  app.use(webhookCallback(bot));
+
+  const botPath = '/index.js'; // Replace with your desired path
+  bot.telegram.setWebhook(`https://your-bot-url${botPath}`);
+  app.use(bot.webhookCallback(botPath));
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`Bot listening on port ${PORT}`);
   });
-} else {
+}
+ else {
   // Use Long Polling for development
   bot.launch();
 }
