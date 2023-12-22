@@ -1,0 +1,120 @@
+const { Telegraf } = require("telegraf");
+
+const bot = new Telegraf("6268369826:AAHrv4JLOIGW_yqke9T3n1yX3F0VKulzfe0");
+const waitingList = [];
+const chatSessions = {};
+let blockerEnabled = false;
+
+// Handle "/start" command
+bot.command("start", (ctx) => {
+  const description =
+    "Welcome to the Encrypted Pair Chat Bot!\n\n" +
+    "This chat bot pairs you with a random stranger for an encrypted chat session.\n\n" +
+    "Rules:\n" +
+    "- Speak in English.\n" +
+    // ... (remaining description)
+
+    ctx.reply(description);
+});
+
+// Handle "/find" command
+bot.command("find", (ctx) => {
+  const userId = ctx.message.chat.id;
+  const activeUsers = Object.keys(chatSessions).length + waitingList.length;
+  const chatSessionCount = Object.keys(chatSessions).length / 2;
+  const waitingListCount = waitingList.length;
+
+  ctx.reply(
+    `Searching for a stranger...\nActive users: ${activeUsers}\nChat connect pairs: ${chatSessionCount}\nWaiting Lists: ${waitingListCount}`,
+  );
+
+  if (userId in chatSessions) {
+    ctx.reply("You are already in a chat. Use /end to leave the chat.");
+  } else if (userId in waitingList) {
+    ctx.reply(
+      "You are already in the waiting list. Please wait for a partner to be assigned.",
+    );
+  } else {
+    waitingList.push(userId);
+    tryMatchPartners();
+  }
+});
+
+// ... (previous code)
+
+// Handle "/blockon" command
+bot.command("blockon", (ctx) => {
+  blockerEnabled = true;
+  ctx.reply("Word blocking is enabled.");
+});
+
+// Handle "/unblock" command
+bot.command("unblock", (ctx) => {
+  blockerEnabled = false;
+  ctx.reply("Word blocking is disabled.");
+});
+
+// Modify the handle_message function to check if blocking is enabled
+bot.on("text", (ctx) => {
+  const userId = ctx.message.chat.id;
+  const text = ctx.message.text;
+
+  if (userId in chatSessions) {
+    const partnerId = chatSessions[userId];
+    if (partnerId) {
+      if (blockerEnabled && containsBlockedWord(text)) {
+        ctx.reply(
+          "Your partner enabled the blocker. Please refrain from using toxic or inappropriate language and respect your partner.",
+        );
+        return;
+      }
+      bot.telegram.sendMessage(partnerId, text);
+    } else {
+      ctx.reply(
+        "You don't have an ongoing chat. Use /find to search for a partner to chat with.",
+      );
+    }
+  } else {
+    ctx.reply(
+      "You don't have an ongoing chat. Use /find to search for a partner to chat with.",
+    );
+  }
+});
+
+// Function to check if the message contains blocked words
+function containsBlockedWord(message) {
+  const blockedWords = [
+    // List of blocked words (same as in Python code)
+  ];
+  const lowerCaseMessage = message.toLowerCase();
+
+  for (const word of blockedWords) {
+    if (lowerCaseMessage.includes(word)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Function to try matching partners from the waiting list
+function tryMatchPartners() {
+  while (waitingList.length >= 2) {
+    const userId1 = waitingList.shift();
+    const userId2 = waitingList.shift();
+
+    chatSessions[userId1] = userId2;
+    chatSessions[userId2] = userId1;
+
+    bot.telegram.sendMessage(
+      userId1,
+      "Partner found! Remember to speak in English with your partner.",
+    );
+    bot.telegram.sendMessage(
+      userId2,
+      "Partner found! Remember to speak in English with your partner.",
+    );
+  }
+}
+
+bot.launch();
