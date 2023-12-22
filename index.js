@@ -115,7 +115,7 @@ if (process.env.NODE_ENV === "production") {
   const app = express();
   app.use(express.json());
 
-  const botPath = 'https://lucky-frog-culottes.cyclic.app/'; // Replace with your desired path
+  const botPath = '/'; // Replace with your desired path
   bot.telegram.setWebhook(`https://your-bot-url${botPath}`);
   app.use(bot.webhookCallback(botPath));
 
